@@ -219,7 +219,7 @@
             let remaining = totalAllowedInvestment - spentPoints;
             let display = document.getElementById('pool-display');
             
-            display.innerText = "Remaining Stat Points: " + remaining + " / " + totalAllowedInvestment;
+            display.innerText = "Remaining Stat Points:" + remaining + " / " + totalAllowedInvestment;
 
             if (remaining < 0) {
                 display.style.color = "#f43f5e"; // Flashes red if they over-allocate points
