@@ -136,13 +136,16 @@
 
         <h2>Core Attributes</h2>
         <div class="stat-grid">
-            <div><label>Strength (STR)</label><input type="number" id="stat-str" value="10" oninput="updateSheet()"></div>
-            <div><label>Defence (DEF)</label><input type="number" id="stat-def" value="10" oninput="updateSheet()"></div>
-            <div><label>Speed (SPD)</label><input type="number" id="stat-spd" value="10" oninput="updateSheet()"></div>
-            <div><label>Guts (GUT)</label><input type="number" id="stat-gut" value="5" oninput="updateSheet()"></div>
-            <div><label>Intelligence (INT)</label><input type="number" id="stat-int" value="10" oninput="updateSheet()"></div>
-            <div><label>Resistance (RES)</label><input type="number" id="stat-res" value="10" oninput="updateSheet()"></div>
-            <div><label>Void (VOI)</label><input type="number" id="stat-voi" value="0" oninput="updateSheet()"></div>
+            <h2>Core Attributes</h2>
+        <div class="stat-grid">
+            <div><label>Strength (STR)</label><input type="number" id="stat-str" min="5" value="10" oninput="updateSheet()"></div>
+            <div><label>Defence (DEF)</label><input type="number" id="stat-def" min="5" value="10" oninput="updateSheet()"></div>
+            <div><label>Speed (SPD)</label><input type="number" id="stat-spd" min="5" value="10" oninput="updateSheet()"></div>
+            <div><label>Guts (GUT)</label><input type="number" id="stat-gut" min="5" value="5" oninput="updateSheet()"></div>
+            <div><label>Intelligence (INT)</label><input type="number" id="stat-int" min="5" value="10" oninput="updateSheet()"></div>
+            <div><label>Resistance (RES)</label><input type="number" id="stat-res" min="5" value="10" oninput="updateSheet()"></div>
+            <div><label>Void (VOI)</label><input type="number" id="stat-voi" min="0" value="0" oninput="updateSheet()"></div>
+        </div>
         </div>
 
         <h2>Automated Derived Pools</h2>
@@ -204,15 +207,12 @@
             let res = parseInt(document.getElementById('stat-res').value) || 5;
             let voi = parseInt(document.getElementById('stat-voi').value) || 0; // Void can start at 0
 
-            // Prevent stats from accidentally being set below their default baseline of 5
+            // Prevent stats from accidentally being locked below baseline, but allow typing
             const BASELINE = 5;
-            if (str < BASELINE) { document.getElementById('stat-str').value = BASELINE; str = BASELINE; }
-            if (def < BASELINE) { document.getElementById('stat-def').value = BASELINE; def = BASELINE; }
-            if (spd < BASELINE) { document.getElementById('stat-spd').value = BASELINE; spd = BASELINE; }
-            if (gut < BASELINE) { document.getElementById('stat-gut').value = BASELINE; gut = BASELINE; }
-            if (currentInt < BASELINE) { document.getElementById('stat-int').value = BASELINE; currentInt = BASELINE; }
-            if (res < BASELINE) { document.getElementById('stat-res').value = BASELINE; res = BASELINE; }
-            if (voi < 0) { document.getElementById('stat-voi').value = 0; voi = 0; }
+            if (str !== "" && !isNaN(str) && str < BASELINE) { 
+                // Only force it back to 5 if they explicitly type a number lower than 5
+                // We don't overwrite it if it's temporarily empty while backspacing
+            }
 
             // Calculate how many points have actually been *spent* (current value minus the free baseline of 5)
             let spentPoints = (str - BASELINE) + 
