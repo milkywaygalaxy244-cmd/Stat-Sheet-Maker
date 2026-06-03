@@ -293,9 +293,9 @@
             let hitReport = "";
             let hitRollText = "";
 
-            if (x <= 0) {
+            if (targetToHit <= 0) {
                 hitReport = "ATTACK ALWAYS MISSES (Accuracy Δ ≤ 0%)";
-            } else if (x >= 100) {
+            } else if (targetToHit >= 100) {
                 hitReport = "ATTACK ALWAYS HITS (Accuracy Δ ≥ 100%)";
             } else {
 	                let roll = Math.floor(Math.random() * 100) + 1;
