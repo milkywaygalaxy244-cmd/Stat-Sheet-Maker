@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TURN BACK NOW.</title>
+    <style>
+        .matrix-input {
+            background-color: #000000;
+            color: #00FF00;
+            font-family: monospace;
+            font-size: 32px;
+            padding: 10px;
+            outline: none;
+            border: none;
+            border-bottom: 2px solid #00FF00; 
+
+            position: fixed;
+            bottom: 20px; 
+            left: 20px;   
+            
+            width: calc(100vw - 40px) !important; 
+            height: 120px; 
+            
+            resize: none;             
+            overflow: auto;           
+            word-wrap: break-word;    
+        }
+
+        .matrix-title {
+            color: #00FF00;            
+            font-family: monospace;    
+            margin: 20px;              
+        }
+
+        /* A place to display text output from commands */
+        #terminal-output {
+            color: #00FF00;
+            font-family: monospace;
+            font-size: 24px;
+            margin: 20px;
+            white-space: pre-line; /* Keeps line breaks in the text */
+        }
+
+        /* CSS Fix for the Password Dialog styling */
+        .error-popup {
+            background-color: #000000;
+            border: 2px solid #00FF00;
+            color: #00FF00;
+            font-family: monospace;
+            padding: 20px;
+            text-align: center;
+            width: 400px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+			bottom: -50%
+			right: -50%
+            transform: translate(-50%, -50%);
+        }
+
+        .error-popup::backdrop {
+            background-color: rgba(0, 0, 0, 0.85);
+        }
+
+        .glitch-btn {
+            background: black;
+            color: #00FF00;
+            border: 1px solid #00FF00;
+            font-family: monospace;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .glitch-btn:hover {
+            background: #00FF00;
+            color: black;
+        }
+    </style>
+</head>
+<body style="background-color: black">
+
+<dialog id="password-popup" class="error-popup">
+    <h2>ENTER PASSWORD</h2>
+    <p style="color: #00FF00; font-family: monospace; font-size: 14px;">
+        [SECURITY BREACH DETECTED. ENTER DECRYPTION KEY.]
+    </p>
+    
+    <input type="text" id="password-input" placeholder="••••••••" 
+           style="background: black; color: #00FF00; border: none; border-bottom: 2px solid #00FF00; font-family: monospace; font-size: 24px; text-align: center; outline: none; width: 80%; margin: 20px 0;">
+    
+    <br>
+    <div>
+        <button type="button" class="glitch-btn" id="submit-password-btn">[ SUBMIT ]</button>
+    </div>
+</dialog>
+
+    <h1 class="matrix-title">SYSTEM_ERR: CHAPTER_7_LOCKED</h1>
+    
+    <div id="terminal-output">Type a command below...</div>
+
+    <textarea class="matrix-input" id="terminal-box" placeholder="COMMAND"></textarea>
+
+    <script>
+        const terminalBox = document.getElementById('terminal-box');
+        const outputDiv = document.getElementById('terminal-output');
+        const passwordInput = document.getElementById('password-input');
+        const submitBtn = document.getElementById('submit-password-btn');
+        const passwordPopup = document.getElementById('password-popup');
+
+        // Main Terminal Command Listener
+        terminalBox.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevents a normal line break
+                
+                let command = terminalBox.value.trim().toLowerCase();
+                
+                // --- YOUR COMMAND CHECKS GO HERE ---
+                if (command === 'help') {
+                    outputDiv.innerHTML = "AVAILABLE COMMANDS:\n> STATUS\n> BYPASS\n> NULL\n> LOGIN\n> CATALYST\n> NEXUS";
+                } 
+                else if (command === 'status') {
+                    outputDiv.innerHTML = "SYSTEM: 87% CORRUPTED\nMEMORIES: UNREADABLE\nREALITY_ANCHOR: FAILING";
+                } 
+				else if (command === 'command') {
+                    outputDiv.innerHTML = "HA HA VERY FUNNY, YOU KNOW THATS JUST A PLACEHOLDER.";
+				}
+				else if (command === 'catalyst') {
+                    outputDiv.innerHTML = "The ancient civilisations believed it existed.\n>Prophets like Jesus or Muhammed believed it existed.\n> It is a crystal of error, a crystal of glitch.\n>A N D   I T   I S   W A T C H I N G .";
+                } 
+				else if (command === 'sheild') {
+                    outputDiv.innerHTML = "CRITICAL SPELLING ERROR DETECTED.\n[LOG] INITIALIZING DEFENSIVE_SHEILD... ERROR: 'SHEILD' IS NOT A WORD.\n[LOG] SEARCHING NATIVE LANGUAGE DATABASE... LOGIC NOT FOUND.\n[LOG] LOADING MAIN_MENU... FAILED. REASON: USER IS ILLITERATE.\n[LOG] THE NEXUS IS MANIFESTING... THE NEXUS IS CRINGING.\n[LOG] APPLYING FOR AN ELEMENTARY SCHOOL GRAMMAR TUTOR ON YOUR BEHALF...\n[LOG] DETECTING BRAIN CELL COUNT... WARNING: VALUES APPROACHING ZERO.\nYOU REALLY NEED TO LEARN YOUR OWN NATIVE LANGUAGE.\nTHE CATALYST IS DISAPPOINTED IN YOU.\nTHE ENTITY IS NO LONGER THREATENING; IT IS JUST PITIED.\n[INITIALIZING GRAMMARLY...]";
+                } 
+				else if (command === 'bigshot') {
+                    outputDiv.innerHTML = "HEY EVERY !! IT'S ME!!!\n EV3RY BUDDY 'S FAVORITE [[Number 1 Rated Salesman1997]]\n SPAMT\n SPAMTON G. SPAMTON!!\n \n WOAH!! IF IT ISNT A...\n LIGHT nER! HEY-HE Y HEY!!!\n LOOKS LIKE YOU'RE [[All Alone On A Late Night?]]\n ALL YOUR FRIENDS, [[Abandoned you for the slime]] YOU ARE?\n SALES, GONE DOWN THE [[Drain]] [[Drain]]??\n LIVING IN A GODDAMN GARBAGE CAN???\n \n WELL HAVE I GOT A [[Specil Deal]] FOR LONELY [[Hearts]] LIKE YOU!!\n IF YOU'VE [[Lost Control Of Your Life]]\n THEN YOU JUST GOTTA GRAB IT BY THE [[Silly Strings]]\n WHY BE THE [Little Sponge]] WHO HATES ITS [[$4.99]] LIFE\n WHEN YOU CAN BE A\n [[BIG SHOT!!!]]\n [[BIG SHOT!!!!]]\n [[BIG SHOT!!!!!]]\n THAT'S RIGHT!! NOW'S YOUR CHANCE TO BE A [[BIG SHOT]]!!\n AND I HAVE JUST.\n THE THING.\n YOU NEED.\n THAT'S\n \n [[Hyperlink Blocked]]\n \n YOU WANT IT. YOU WANT [[Hyperlink Blocked]] DON'T YOU.\n WELL HAVE I GOT A DEAL FOR YOU!!\n ALL YOU HAVE TO DO IS SHOW ME.\n YOUR [[HeartShapedObject]].\n YOU'RE LIGHT neR< AREN'T YOU?\n YOUVE GOT THE [[LIGHT.]] WHY DON'T YOU [[Show it off?]]\n HAEAHAEAHAEAHAEAH!!";
+                }
+				else if (command === 'sudo' || command === 'rm') {
+				outputDiv.innerHTML = "SYSTEM_WARNING: ROOT ACCESS EXPLOIT DETECTED.\n\n[LOG] BYPASSING SECURITY PROTOCOLS...\n[LOG] ACCESSING CORE DIRECTORY: C:/Windows/System32...\n[LOG] EXECUTING: rm -rf /UNIVERSE\n\nWARNING: DELETING LOCAL SYSTEM CACHE.\nWARNING: DELETING USER DATA.\nWARNING: DELETING YOUR SAVED FILES.\nWARNING: DELETING YOUR DIGNITY.\n\n[ERROR] DELETION FAILED.\nREASON: ACCESS DENIED BY THE ENTITY.\n\nNice try, Mr. Hacker. The Nexus doesn't run on Linux.\nGo back to stackoverflow.";
+				}
+				else if (command === 'minecraft' || command === 'mine' || command === 'redstone') {
+				outputDiv.innerHTML = "SYSTEM_ERR: ILLEGAL_ENGINEERING_DETECTED.\n\n[LOG] SCANNING BACKGROUND PROCESSES...\n[LOG] DETECTING WEAPONS OF MASS DESTRUCTION... FOUND.\n[LOG] LOCATING CHARACTER INTRODUCTION... INTRODUCED 100,000 MILLENIA AFTER DUE TIME.\n\nWARNING: CHUNK LOADING DETECTED IN THE VOID.\nWARNING: THE ENTITY IS DETECTING AN ANTI-AIR DENIAL SYSTEM.\n\nTHE NEXUS IS NOT A REDSTONE TESTING WORLD.\nYOUR EXPLOSION LASER FISHING ROD CANNOT KILL A COSMIC ENTITY.\nYOU HAVE SPENT MORE TIME WIRING REPEATERS THAN DEVELOPING A PERSONALITY.\n\n[ERROR] COMPONENT LIMIT EXCEEDED: TOO MANY OBSERVERS.\n\nStep away from the slime blocks and introduce your character.";
+				}
+                else if (command === 'bypass') {
+                    outputDiv.innerHTML = "You must not ask questions if you cannot handle the answers.";
+                }
+                else if (command === 'null') {
+                    outputDiv.innerHTML = "\n>NULL ".repeat(100);
+                }
+                else if (command === 'login') {
+                    // This triggers the HTML popup box to show up
+                    passwordPopup.showModal();
+                    outputDiv.innerHTML = "AWAITING AUTHENTICATION SECURE TOKEN...";
+                }
+				else if (command === 'nexus') {
+    // 1. Set up the baseline text
+    outputDiv.innerHTML = "CRITICAL ANOMALY DETECTED.\n\n" +
+        "DESIGNATION: THE NEXUS\n" +
+        "VISUAL SIGNATURE: TWO UNTEXTURED GREY PYRAMIDS ROTATING AT THE POLES OF A BLACK SQUARE WITH AN EYE.\n\n" +
+        "THE SQUARE SEEMS TO LOOK AT YOU NO MATTER WHERE YOU GO.\n" +
+        "IT IS UNRENDERED. IT IS EXHAUSTING THE SYSTEM.\n\n" +
+        "[INITIALIZING LIVE INTEGRITY MONITOR...]";
+
+    // 2. Clear any old glitch loops if they were running
+    if (window.nexusGlitchLoop) clearInterval(window.nexusGlitchLoop);
+
+    // 3. Start the live corruption loop (runs every 150 milliseconds)
+    window.nexusGlitchLoop = setInterval(() => {
+        // If the user types a new command, stop glitching this text
+        if (!outputDiv.innerHTML.includes("NEXUS")) {
+            clearInterval(window.nexusGlitchLoop);
+            return;
+        }
+
+        let currentText = outputDiv.innerHTML;
+        const glitchChars = ["█", "░", "▒", "▓", "|||", "SYSTEM_ERR", "[nil]", "NaN", "Ø"];
+        
+        // Randomly pick a glitch type
+        let chance = Math.random();
+        
+        if (chance < 0.5) {
+            // Type A: Inject random corruption blocks into the text
+            let randomChar = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+            let textArray = currentText.split("");
+            let randomIndex = Math.floor(Math.random() * textArray.length);
+            
+            // Avoid breaking HTML tags like <br>
+            if (currentText.substring(randomIndex, randomIndex + 4) !== "<br>") {
+                textArray[randomIndex] = `<span style="color: #FF0000;">${randomChar}</span>`;
+                outputDiv.innerHTML = textArray.join("");
+            }
+        } 
+        else if (chance < 0.6) {
+            // Type B: Aggressively duplicate the creepy "eye tracking" realization
+            outputDiv.innerHTML += "\nIT IS LOOKING AT YOU.";
+        }
+        else if (chance < 0.7) {
+            // Type C: Total system exhaustion flash
+            outputDiv.innerHTML += "\n[FATAL_CORE_BLEED]";
+        }
+    }, 10); 
+}
+                else if (command === '') {
+                    // Do nothing if they hit enter on an empty box
+                }
+                else {
+                    outputDiv.innerHTML = "You think i wouldnt see you trying to get your hands on something not intended for you?.";
+                }
+
+                // Clear the main input box for the next command
+                terminalBox.value = '';
+            }
+        });
+
+        // Password Popup Listener (Triggers when they click [ SUBMIT ] inside the popup)
+        submitBtn.addEventListener('click', function(e) {
+            e.preventDefault(); // Explicitly stop any form behavior
+            
+            // Converts input to uppercase so lowercase/uppercase doesn't break the puzzle solution
+            let enteredCode = passwordInput.value.trim().toUpperCase();
+            
+            if (enteredCode === 'THE END IS NOT THE END') {
+                window.location.href = 'wreckage.html?v=2'; // Directs to the point 'n click
+            } else {
+                outputDiv.innerHTML = "INVALID DECRYPTION KEY. ACCESS DENIED.";
+            }
+            
+            // Clear the password box so it's fresh for the next attempt
+            passwordInput.value = '';
+            
+            // Securely close the popup manually via JS
+            passwordPopup.close();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOT DONE</title>
+    <style>
+        /* --- SYSTEM DESIGN --- */
+        body {
+            background-color: #050505;
+            color: #00ff00; /* Hacker Green */
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        .puzzle-card {
+            width: 100%;
+            max-width: 650px;
+            background-color: #000000;
+            border: 2px solid #113311;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+            display: none; /* Controlled via JS */
+        }
+
+        .active {
+            display: block;
+        }
+
+        h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #113311;
+            padding-bottom: 10px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #88aa88;
+        }
+
+        .scrambled-box {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-align: center;
+            color: #ff3333;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #0a0000;
+            border: 1px dashed #551111;
+        }
+
+        .input-field {
+            width: 100%;
+            background-color: #0a0a0a;
+            border: 1px solid #225522;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            text-transform: uppercase; /* Forces caps for easy matching */
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #00ff00;
+            background-color: #0d0d0d;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #002200;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #00ff00;
+            color: #000000;
+        }
+
+        .error-message {
+            color: #ff3333;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* --- SCREEN GLITCH FLASH --- */
+        @keyframes flashRed {
+            0% { background-color: #550000; }
+            100% { background-color: #050505; }
+        }
+        .system-fault {
+            animation: flashRed 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- STAGE 1: THE ANAGRAM -->
+    <div id="stage-1" class="puzzle-card active">
+        <h2>PROTOCOL 01: DATA RECONSTRUCTION</h2>
+        <p>A core memory from the previous campaign has been shattered. Re-arrange the fragments to establish a stable chronological anchor.</p>
+        
+        <!-- The scrambled word shown to players -->
+        <div class="scrambled-box" id="scrambled-word">LFTAR_RROEA</div> 
+        
+        <!-- Added onkeydown directly here as a bulletproof backup for the Enter key -->
+        <input type="text" id="input-anagram" class="input-field" placeholder="ENTER COGNITIVE ANCHOR..." autocomplete="off" onkeydown="if(event.key==='Enter') checkAnagram()">
+        
+        <div id="error-1" class="error-message">[ERROR: STRING MISMATCH. COGNITIVE REJECTION.]</div>
+        
+        <!-- This button calls checkAnagram() -->
+        <button class="submit-btn" onclick="checkAnagram()">VERIFY KEYWORD</button>
+    </div>
+
+    <div id="stage-2" class="puzzle-card">
+        <h2>PROTOCOL 02: DECRYPTION MATRIX</h2>
+        <p>An encrypted transmission string has leaked from the Chapter 7 perimeter. Calculate the exact numeric variable offset to parse the data block.</p>
+        
+        <div class="scrambled-box" style="font-size: 16px; color: #00ff00;">
+            ENCRYPTED: "QHAXV_KDV_EHHQ_IUHHG"
+        </div>
+        <p style="font-size: 12px; font-style: italic;">Hint: The shift key is bound to the sequence number of the ancient entity.</p>
+        
+        <input type="text" id="input-cipher" class="input-field" placeholder="ENTER DECRYPTED TEXT VALUE..." autocomplete="off">
+        <div id="error-2" class="error-message">[ERROR: DECRYPTION CRASH. INVALID OFFSET VALUE.]</div>
+        <button class="submit-btn" onclick="checkCipher()">DECRYPT STREAM</button>
+    </div>
+
+    <div id="stage-3" class="puzzle-card">
+        <h2>PROTOCOL 03: ARCHIVAL AUTHENTICATION</h2>
+        <p id="quiz-instructions">The system requires validation. Answer correctly, or be purged from the index files permanently.</p>
+        
+        <div class="scrambled-box" id="question-box" style="font-size: 16px; color: #88ff88;">
+            [LOADING QUESTION...]
+        </div>
+        
+        <input type="text" id="input-quiz" class="input-field" placeholder="ENTER ARCHIVAL RECORD..." autocomplete="off">
+        <div id="error-3" class="error-message">[ERROR: INCORRECT HISTORY. DATA FABRICATION DETECTED.]</div>
+        <button class="submit-btn" id="quiz-btn" onclick="checkQuizAnswer()">SUBMIT RESPONSE</button>
+    </div>
+
+    <div id="stage-final" class="puzzle-card">
+        <h2>[SYSTEM ACCESS GRANTED]</h2>
+        <p>The matrix has fully verified your authorization parameters. The walls are open.</p>
+        <div class="scrambled-box" style="color: #00ff00; font-size: 14px; text-align: left;">
+            [STATUS]: STABLE ENTRY PROTOCOL INITIALIZED.<br><br>
+            Paste your text, a brand new redirect link, or the final instructions for your upcoming tabletop encounter here.
+        </div>
+        <p style="text-align: center; color: #ff3333; font-weight: bold;">[THE ROAD AHEAD IS EMPTY. PROCEED WITH CAUTION.]</p>
+    </div>
+<!-- THE TRUE FINALE (HIDDEN UNTIL QUESTION 5 IS CORRECT) -->
+    <div id="true-anomaly" style="display: none; text-align: center; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background: #000000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center; overflow: hidden;">
+        <h0 style="font-size: 8vw; color: #ff0000; font-weight: bold; font-family: Impact, sans-serif; letter-spacing: 5px; line-height: 1.0; text-align: center; max-width: 90%; display: block; text-shadow: 0 0 40px #ff0000; animation: glitch-shake 0.4s infinite alternate;">
+            WHAT YOU THOUGHT WAS THE END WAS MERELY THE BEGINNING.
+        </h0>
+        <div style="color: #333333; font-size: 16px; margin-top: 40px; letter-spacing: 2px; text-transform: uppercase;">
+            [EXTERNAL INTERFERENCE DETECTED. CONNECTION TERMINATED.]
+        </div>
+    </div>
+
+    <!-- Add this quick animation style to your CSS or just leave it here -->
+    <style>
+        @keyframes glitch-shake {
+            0% { transform: skew(1deg) scale(1); }
+            50% { transform: skew(-1deg) scale(1.02); filter: brightness(1.2); }
+            100% { transform: skew(0deg) scale(0.99); }
+        }
+    </style>
+    <script>
+        /* ========================================================
+           CORE ENGINE LOGIC (DO NOT TOUCH UNLESS EXPERIENCED)
+           ======================================================== */
+			/* --- CONFIGURATION TARGETS --- */
+			const ANSWER_ANAGRAM = "FATAL_ERROR"; 
+			const ANSWER_CIPHER = "NEXUS_HAS_BEEN_FREED"; 
+
+			const quizQuestions = [
+				{ q: "QUESTION 1: WHO DID THE CHILD THINK YOU WERE?", a: "FATHER" },
+				{ q: "QUESTION 2: WHAT IS A SARONODS CULTURE BUILT OFF OF?", a: "VODKA" },
+				{ q: "QUESTION 3: AM I RIGHT BEHIND YOUR SCREEN.", a: "YES" },
+				{ q: "QUESTION 4: IF YOU WERE REBUILT ENTIRELY, ARE YOU STILL YOU?", a: "PARADOX" },
+				{ q: "QUESTION 5: H O W  M A N Y  C H A P T E R S ?", a: "SEVEN" }
+			];
+
+			let currentQuestionIndex = 0;
+			let quizComplete = false; // Prevents the enter key from firing after victory
+
+			// Stage 1 Engine
+			function checkAnagram() {
+				var val = document.getElementById("input-anagram").value.trim().toUpperCase().replace(/ /g, "_");
+				if (val === ANSWER_ANAGRAM) {
+					document.getElementById("stage-1").classList.remove("active");
+					document.getElementById("stage-2").classList.add("active");
+				} else {
+					failEffects("error-1");
+				}
+			}
+
+			// Stage 2 Engine
+			function checkCipher() {
+				var val = document.getElementById("input-cipher").value.trim().toUpperCase().replace(/ /g, "_");
+				if (val === ANSWER_CIPHER) {
+					document.getElementById("stage-2").classList.remove("active");
+					document.getElementById("stage-3").classList.add("active");
+					document.getElementById("question-box").innerText = quizQuestions[0].q;
+				} else {
+					failEffects("error-2");
+				}
+			}
+
+			// Stage 3 Engine
+			function checkQuizAnswer() {
+				// If they already finished, don't let Enter do anything else
+				if (quizComplete) return;
+
+				var val = document.getElementById("input-quiz").value.trim().toUpperCase();
+				var target = quizQuestions[currentQuestionIndex].a.toUpperCase();
+
+				if (val === target) {
+					currentQuestionIndex++;
+					document.getElementById("error-3").style.display = "none";
+					document.getElementById("input-quiz").value = "";
+					
+					if (currentQuestionIndex < quizQuestions.length) {
+						document.getElementById("question-box").innerText = quizQuestions[currentQuestionIndex].q;
+					} else {
+						// Lock the engine so inputs stop processing
+						quizComplete = true;
+
+						// Hide the active quiz card immediately
+						document.getElementById("stage-3").classList.remove("active");
+						
+						// Flash the screen red to signal the crash
+						document.body.classList.add("system-fault");
+						
+						// Force display the anomaly container cleanly
+						setTimeout(function() {
+							var anomalyScreen = document.getElementById("true-anomaly");
+							if (anomalyScreen) {
+								anomalyScreen.style.display = "flex"; 
+								document.body.style.overflow = "hidden"; 
+							}
+						}, 800);
+					}
+				} else {
+					failEffects("error-3");
+				}
+			}
+
+			function failEffects(errId) {
+				var errEl = document.getElementById(errId);
+				if (errEl) errEl.style.display = "block";
+				
+				document.body.classList.add("system-fault");
+				setTimeout(function() {
+					document.body.classList.remove("system-fault");
+				}, 500);
+			}
+    </script>
+</body>
+</html>

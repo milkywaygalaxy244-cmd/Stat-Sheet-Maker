@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS</title>
+    
+    <style>
+        /* --- SYSTEM STYLES --- */
+        body {
+            background-color: #050505;
+            color: #aaaaaa;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- THE POINT & CLICK AREA --- */
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background-color: #111111;
+            border: 2px solid #222222;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        /* --- THE GHOST HITBOXES --- */
+        .clickable-npc {
+            position: absolute;
+            cursor: pointer;
+            border: 1px dashed rgba(255, 0, 0, 0.3); /* Change 0.3 to 0 to hide completely */
+            transition: background-color 0.2s ease;
+        }
+
+        .clickable-npc:hover {
+            background-color: rgba(255, 0, 0, 0.05);
+        }
+
+        /* Coordinates for hitboxes */
+        #npc-companion { top: 180px; left: 150px; width: 70px; height: 130px; }
+        #npc-guide { top: 200px; left: 580px; width: 60px; height: 110px; }
+        #nexus-anomaly { top: 120px; left: 360px; width: 90px; height: 90px; }
+
+        /* --- NEW: THE PATH NAVIGATION CONTROLS --- */
+        #navigation-overlay {
+            width: 800px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background-color: #000000;
+            color: #00ff00; /* Hacker green buttons */
+            border: 1px solid #222222;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background-color: #111111;
+            border-color: #00ff00;
+        }
+
+        .nav-btn:disabled {
+            color: #333333;
+            border-color: #111111;
+            cursor: not-allowed;
+            background-color: #000000;
+        }
+
+        /* --- THE FAILSAFE DIALOGUE BOX --- */
+        #dialogue-box {
+            width: 800px;
+            height: 120px;
+            margin-top: 15px;
+            background-color: #000000;
+            border: 1px solid #222222;
+            padding: 15px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        #dialogue-text {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-line;
+        }
+
+        /* --- GLITCH MECHANICS --- */
+        @keyframes screenShake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            100% { transform: translate(-1px, -2px) rotate(-1deg); }
+        }
+
+        .system-collapse {
+            animation: screenShake 0.1s infinite !important;
+            border-color: #ff0000 !important;
+        }
+		/* Hide everything by default */
+		#npc-companion, #npc-guide, #nexus-anomaly {
+			display: none;
+		}
+    </style>
+</head>
+<body>
+
+    <!-- 1. The Visual Field -->
+    <div id="game-container">
+        <div class="clickable-npc" id="npc-companion" onclick="scanAsset('companion')"></div>
+        <div class="clickable-npc" id="npc-guide" onclick="scanAsset('guide')"></div>
+        <div class="clickable-npc" id="nexus-anomaly" onclick="scanAsset('nexus')"></div>
+    </div>
+
+    <!-- HERE IS WHERE THE NEW NAVIGATION HTML SLOTS IN -->
+    <div id="navigation-overlay">
+        <button id="btn-left" class="nav-btn" onclick="changeRoom('left')">← Go Left</button>
+        <button id="btn-forward" class="nav-btn" onclick="changeRoom('forward')">↑ Move Deeper</button>
+        <button id="btn-right" class="nav-btn" onclick="changeRoom('right')">Go Right →</button>
+    </div>
+
+    <!-- 2. The Output Box -->
+    <div id="dialogue-box">
+        <p id="dialogue-text">System status: LOCALIZED RECOVERY MODE. Select an anomalous asset or map vector.</p>
+    </div>
+
+    <!-- 3. The Map & Movement Logic Engine -->
+    <script>
+        const systemArchive = {
+            companion: "This is a failsafe for when a characters .char and .ref files do not match up, this causes errors in the dialogue system leading to this error, please refrain from editing character files unless you absolutely have to.",
+            guide: "This dialogue is for when a characters .char and .ref are mismatched, refrain from editing character files.",
+            nexus: "BOW DOWN TO THE CATALYST."
+        };
+
+        const rooms = {
+            entrance: {
+                background: "#0d0d0d", 
+                text: "STAGE 1 - ARCHIVE ENTRANCE: Data integrity low. Remnants of Chapter 1 baseline protocols detected.",
+                paths: { left: "flooded_sector", forward: "blocked", right: "quarantine_zone" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "block";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            flooded_sector: {
+                background: "#05111a", 
+                text: "STAGE 2 - FLOODED MEMORY STORAGE: Memory leak in progress. A dead end, unless you look back.",
+                paths: { left: "blocked", forward: "blocked", right: "entrance" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            quarantine_zone: {
+                background: "#1c1405", 
+                text: "STAGE 3 - QUARANTINE: Remnants of Chapter 3 fallout logs. The path splits dynamically.",
+                paths: { left: "entrance", forward: "broken_server", right: "deep_vault" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            broken_server: {
+                background: "#1a0a0a", 
+                text: "STAGE 4 - CORE SERVER STACK: The files are torn wide open here. Total loop detected.",
+                paths: { left: "quarantine_zone", forward: "blocked", right: "quarantine_zone" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "block";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            deep_vault: {
+                background: "#0a1a0a", 
+                text: "STAGE 5 - THE ABYSSAL ARCHIVE: Chapter 5 and 6 data caches have completely melted together.",
+                paths: { left: "quarantine_zone", forward: "nexus_threshold", right: "blocked" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            nexus_threshold: {
+                background: "#020202", 
+                text: "STAGE 6 - ANOMALOUS OVERFLOW OUTFLOW: Gravity is failing. The system is fighting its own structure. Move forward.",
+                paths: { left: "blocked", forward: "nexus_core", right: "deep_vault" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "none";
+                }
+            },
+            nexus_core: {
+                background: "#000000",
+                text: "CHAPTER 7 - CRITICAL PROXIMITY: THE UNCOMPUTABLE. GET OUT.",
+                paths: { left: "blocked", forward: "blocked", right: "blocked" },
+                setup: () => {
+                    document.getElementById("npc-companion").style.display = "none";
+                    document.getElementById("npc-guide").style.display = "none";
+                    document.getElementById("nexus-anomaly").style.display = "block";
+                }
+            }
+        };
+
+        let currentRoom = "entrance";
+        let glitchTimeout = null;
+
+        function changeRoom(direction) {
+            const roomData = rooms[currentRoom];
+            const nextRoomName = roomData.paths[direction];
+            if (nextRoomName === "blocked") return;
+            currentRoom = nextRoomName;
+            const nextRoom = rooms[currentRoom];
+            const viewer = document.getElementById("game-container");
+            const display = document.getElementById("dialogue-text");
+            viewer.style.backgroundColor = nextRoom.background;
+            display.innerText = nextRoom.text;
+            display.style.color = "#aaaaaa";
+            display.style.fontWeight = "normal";
+            nextRoom.setup();
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const paths = rooms[currentRoom].paths;
+            document.getElementById("btn-left").disabled = (paths.left === "blocked");
+            document.getElementById("btn-forward").disabled = (paths.forward === "blocked");
+            document.getElementById("btn-right").disabled = (paths.right === "blocked");
+        }
+
+        function scanAsset(assetId) {
+            const display = document.getElementById("dialogue-text");
+            const viewer = document.getElementById("game-container");
+            
+            // Logic: Determine if it's a nexus or an NPC
+            if (assetId === 'nexus') {
+                window.location.href = 'puzzle.html?v=2';
+                return; // Stop here if it's the nexus
+            }
+
+            // Normal NPC dialogue logic
+            display.innerText = systemArchive[assetId];
+            display.style.color = "#aaaaaa";
+            display.style.fontWeight = "normal";
+        }
+
+        // Initialize starting state
+        updateButtons();
+        rooms.entrance.setup();
+    </script>
+<script>
+    document.getElementById('nexus-anomaly').addEventListener('click', function() {
+        window.location.href = 'puzzle.html?v=2';
+    });
+</script>
+</body>
+</html>
