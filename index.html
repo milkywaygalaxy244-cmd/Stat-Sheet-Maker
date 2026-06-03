@@ -172,6 +172,11 @@
             </div>
             <button class="calc-btn" onclick="runCombatSimulation()">EXECUTE ENCOUNTER FORMULAS</button>
             <div id="combat-output">Awaiting calculation input...</div>
+			
+			<h2>Configuration Archive</h2>
+        <div class="combat-engine" style="border-style: solid; border-color: #38bdf8;">
+            <button class="calc-btn" style="background: #34d399;" onclick="exportCharacterSheet()">DOWNLOAD DATA SHEET TEMPLATE</button>
+        </div>
         </div>
     </div>
 
@@ -302,7 +307,75 @@
                 "🌀 VOID DAMAGE: " + voidDmg.toFixed(2) + "<br>" +
                 "🎯 HIT DETERMINATION: " + hitReport + hitRollText;
         }
+		function exportCharacterSheet() {
+            // Grab the text/numerical values from the inputs
+            let nameInfo = document.querySelector('input[value*="John Example"]').value || "Unknown Subject";
+            let class1 = document.querySelectorAll('input[placeholder="COOL THINGY HERE"]')[0].value || "NONE";
+            let class2 = document.querySelectorAll('input[placeholder="COOL THINGY HERE"]')[1].value || "NONE";
+            let level = document.getElementById('base-level').value || "1";
 
+            // Grab core attributes
+            let str = document.getElementById('stat-str').value;
+            let def = document.getElementById('stat-def').value;
+            let spd = document.getElementById('stat-spd').value;
+            let gut = document.getElementById('stat-gut').value;
+            let currentInt = document.getElementById('stat-int').value;
+            let res = document.getElementById('stat-res').value;
+            let voi = document.getElementById('stat-voi').value;
+
+            // Grab textareas
+            let textareas = document.querySelectorAll('textarea');
+            let abilities = textareas[0].value || "";
+            let passives = textareas[1].value || "";
+            let specialDefs = textareas[2].value.trim();
+            let multiTable = textareas[3].value.trim();
+
+            // Calculate live pools dynamically
+            let hp = (parseInt(str) + parseInt(def)) * 2;
+            let shield = (parseInt(def) + parseInt(str)) * 2;
+            let vp = Math.floor(((parseInt(currentInt) + parseInt(res)) * parseInt(gut)) / 5);
+            let pp = parseInt(currentInt) * 3;
+
+            // Build the exact template layout
+            let templateText = `${nameInfo} - CLASS 1 (${class1}) - CLASS 2 (${class2})\n`;
+            templateText += `Level: ${level}\n`;
+            templateText += `HP: ${hp}\n`;
+            templateText += `SHIELD: ${shield}\n`;
+            templateText += `VP: ${vp}\n`;
+            templateText += `PP: ${pp}\n`;
+            templateText += `Strength: ${str}\n`;
+            templateText += `Defence: ${def}\n`;
+            templateText += `Speed: ${spd}\n`;
+            templateText += `Guts: ${gut}\n`;
+            templateText += `Intelligence: ${currentInt}\n`;
+            templateText += `Resistance: ${res}\n`;
+            templateText += `Void: ${voi}\n`;
+            
+            templateText += `-ABILITIES-\n${abilities}\n\n`;
+            templateText += `-PASSIVES-\n${passives}\n\n`;
+
+            // Smart conditional removal based on your template rules
+            if (specialDefs !== "") {
+                templateText += `-SPECIAL STAT DEFINITIONS-\n${specialDefs}\n\n`;
+            }
+            
+            if (multiTable !== "") {
+                templateText += `-ABILITY TABLE-\n${multiTable}\n`;
+            }
+
+            // Create browser download link
+            let blob = new Blob([templateText], { type: "text/plain;charset=utf-8" });
+            let tempLink = document.createElement("a");
+            
+            let safeName = nameInfo.split(" - ")[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            tempLink.download = `${safeName}_sheet.txt`;
+            
+            tempLink.href = URL.createObjectURL(blob);
+            tempLink.style.display = "none";
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+        }
         // Set the core attribute input defaults to 5 right away on page load
         window.onload = function() {
             document.getElementById('stat-str').value = 5;
