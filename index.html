@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Core // Character Stat & Combat Generator</title>
+    <style>
+        body {
+            background-color: #121214;
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sheet-container {
+            width: 100%;
+            max-width: 700px;
+            background: #1a1a1e;
+            border: 1px solid #2d2d34;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 18px; color: #38bdf8; border-bottom: 2px dashed #2d2d34; padding-bottom: 10px; margin-top: 0; }
+        h2 { font-size: 14px; color: #f43f5e; margin-top: 25px; border-bottom: 1px solid #2d2d34; padding-bottom: 5px; }
+
+        .row { display: flex; gap: 15px; margin-bottom: 12px; align-items: center; }
+        .flex-1 { flex: 1; }
+        
+        label { font-size: 13px; font-weight: bold; color: #94a3b8; text-transform: uppercase; }
+        
+        input, textarea {
+            width: 100%;
+            background: #27272a;
+            border: 1px solid #3f3f46;
+            color: #fff;
+            padding: 8px;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        /* Calculated Derived Stats Box */
+        .derived-box {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .derived-stat {
+            font-size: 14px;
+            color: #34d399;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .combat-engine {
+            background: #212127;
+            padding: 15px;
+            border: 1px dashed #4b5563;
+        }
+
+        .calc-btn {
+            background: #38bdf8;
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .calc-btn:hover { background: #7dd3fc; }
+
+        #combat-output {
+            margin-top: 15px;
+            background: #000;
+            padding: 12px;
+            color: #f43f5e;
+            font-size: 13px;
+            min-height: 40px;
+            border-left: 3px solid #f43f5e;
+        }
+
+        /* --- THE HIDDEN WAY IN --- */
+        .dead-zone {
+            margin-top: 1200px; /* Deep scroll */
+            padding: 40px 0;
+            text-align: center;
+        }
+        .ghost-link {
+            color: #1a1a1e; /* Camouflaged against background */
+            text-decoration: none;
+            font-size: 12px;
+            transition: color 0.5s;
+        }
+        .ghost-link:hover { color: #3f3f46; }
+    </style>
+</head>
+<body>
+
+    <div class="sheet-container">
+        <h1>CHARACTER ATTRIBUTE CONFIGURATOR v4.01</h1>
+        
+        <!-- Metadata Header -->
+        <div class="row">
+            <div class="flex-1">
+                <label>Character Name & Info</label>
+                <input type="text" value="John Example - hes a guy called john and hes an example">
+            </div>
+        </div>
+        <div class="row">
+            <div class="flex-1">
+                <label>Class 1 (Optional)</label>
+                <input type="text" placeholder="COOL THINGY HERE">
+            </div>
+            <div class="flex-1">
+                <label>Class 2 (Optional)</label>
+                <input type="text" placeholder="COOL THINGY HERE">
+            </div>
+            <div style="width: 100px;">
+                <label>Level</label>
+                <input type="number" id="base-level" value="1">
+            </div>
+        </div>
+
+        <h2>Core Attributes</h2>
+        <div class="stat-grid">
+            <div><label>Strength (STR)</label><input type="number" id="stat-str" value="10" oninput="updateSheet()"></div>
+            <div><label>Defence (DEF)</label><input type="number" id="stat-def" value="10" oninput="updateSheet()"></div>
+            <div><label>Speed (SPD)</label><input type="number" id="stat-spd" value="10" oninput="updateSheet()"></div>
+            <div><label>Guts (GUT)</label><input type="number" id="stat-gut" value="5" oninput="updateSheet()"></div>
+            <div><label>Intelligence (INT)</label><input type="number" id="stat-int" value="10" oninput="updateSheet()"></div>
+            <div><label>Resistance (RES)</label><input type="number" id="stat-res" value="10" oninput="updateSheet()"></div>
+            <div><label>Void (VOI)</label><input type="number" id="stat-voi" value="0" oninput="updateSheet()"></div>
+        </div>
+
+        <h2>Automated Derived Pools</h2>
+        <div class="derived-box">
+            <div class="derived-stat" id="calc-hp">HP: --</div>
+            <div class="derived-stat" id="calc-shield">SHIELD: --</div>
+            <div class="derived-stat" id="calc-vp">VP: --</div>
+            <div class="derived-stat" id="calc-pp">PP: --</div>
+        </div>
+
+        <h2>Abilities & Tables</h2>
+        <div class="row"><div class="flex-1"><label>Abilities</label><textarea rows="3" placeholder="input abilities here"></textarea></div></div>
+        <div class="row"><div class="flex-1"><label>Passives</label><textarea rows="3" placeholder="input passives here"></textarea></div></div>
+        <div class="row"><div class="flex-1"><label>Special Stat Definitions</label><textarea rows="2" placeholder="Only for if you give your character the SPECIAL class..."></textarea></div></div>
+        <div class="row"><div class="flex-1"><label>Ability Table</label><textarea rows="2" placeholder="For multi-roll item generation tables..."></textarea></div></div>
+
+        <h2>Live Combat Simulation Engine</h2>
+        <div class="combat-engine">
+            <div class="stat-grid" style="margin-top:0; margin-bottom:10px;">
+                <div><label>Enemy DEF</label><input type="number" id="enemy-def" value="10"></div>
+                <div><label>Enemy RES</label><input type="number" id="enemy-res" value="10"></div>
+                <div><label>Enemy SPD</label><input type="number" id="enemy-spd" value="10"></div>
+                <div><label>Enemy INT</label><input type="number" id="enemy-int" value="10"></div>
+                <div><label>Enemy VOI</label><input type="number" id="enemy-voi" value="0"></div>
+            </div>
+            <button class="calc-btn" onclick="runCombatSimulation()">EXECUTE ENCOUNTER FORMULAS</button>
+            <div id="combat-output">Awaiting calculation input...</div>
+        </div>
+    </div>
+
+    <!-- THE TRAP DOOR -->
+    <div class="dead-zone">
+		<a href="terminal.html?v=2" class="ghost-link">[SYS_BACKDOOR_LOG_01]</a>
+	</div>
+    <script>
+        // --- DERIVED STAT FORMULAS ---
+        // --- DERIVED STAT FORMULAS & POINT POOL BALANCE ---
+        function updateSheet() {
+            // Get current level
+            let level = parseInt(document.getElementById('base-level').value) || 1;
+            if (level < 1) level = 1; // Level cannot be 0 or negative
+
+            // Calculate total point pool: 18 base points + 1 per level
+            let totalAllowedInvestment = 17 + level;
+
+            // Get current attribute values from inputs
+            let str = parseInt(document.getElementById('stat-str').value) || 5;
+            let def = parseInt(document.getElementById('stat-def').value) || 5;
+            let spd = parseInt(document.getElementById('stat-spd').value) || 5;
+            let gut = parseInt(document.getElementById('stat-gut').value) || 5;
+            let currentInt = parseInt(document.getElementById('stat-int').value) || 5;
+            let res = parseInt(document.getElementById('stat-res').value) || 5;
+            let voi = parseInt(document.getElementById('stat-voi').value) || 0; // Void can start at 0
+
+            // Prevent stats from accidentally being set below their default baseline of 5
+            const BASELINE = 5;
+            if (str < BASELINE) { document.getElementById('stat-str').value = BASELINE; str = BASELINE; }
+            if (def < BASELINE) { document.getElementById('stat-def').value = BASELINE; def = BASELINE; }
+            if (spd < BASELINE) { document.getElementById('stat-spd').value = BASELINE; spd = BASELINE; }
+            if (gut < BASELINE) { document.getElementById('stat-gut').value = BASELINE; gut = BASELINE; }
+            if (currentInt < BASELINE) { document.getElementById('stat-int').value = BASELINE; currentInt = BASELINE; }
+            if (res < BASELINE) { document.getElementById('stat-res').value = BASELINE; res = BASELINE; }
+            if (voi < 0) { document.getElementById('stat-voi').value = 0; voi = 0; }
+
+            // Calculate how many points have actually been *spent* (current value minus the free baseline of 5)
+            let spentPoints = (str - BASELINE) + 
+                              (def - BASELINE) + 
+                              (spd - BASELINE) + 
+                              (gut - BASELINE) + 
+                              (currentInt - BASELINE) + 
+                              (res - BASELINE) + 
+                              voi; // Assuming void investment counts 1-to-1 from 0
+
+            let remaining = totalAllowedInvestment - spentPoints;
+            let display = document.getElementById('pool-display');
+            
+            display.innerText = "Remaining Stat Points: " + remaining + " / " + totalAllowedInvestment;
+
+            if (remaining < 0) {
+                display.style.color = "#f43f5e"; // Flashes red if they over-allocate points
+            } else {
+                display.style.color = "#34d399"; // Green if safe
+            }
+
+            // --- STANDARD DERIVED CALCULATIONS ---
+            // Hp: (str+def)x2
+            document.getElementById('calc-hp').innerText = "HP: " + ((str + def) * 2);
+            
+            // SHIELD: (def+str)x2
+            document.getElementById('calc-shield').innerText = "SHIELD: " + ((def + str) * 2);
+            
+            // VP: (int+res)xgut/5
+            document.getElementById('calc-vp').innerText = "VP: " + Math.floor(((currentInt + res) * gut) / 5);
+            
+            // PP: intx3
+            document.getElementById('calc-pp').innerText = "PP: " + (currentInt * 3);
+        }
+
+        // --- COMPLEX MATH COMBAT SIMULATION ---
+        function runCombatSimulation() {
+            let xst = parseInt(document.getElementById('stat-str').value) || 5;
+            let xsp = parseInt(document.getElementById('stat-spd').value) || 5;
+            let xin = parseInt(document.getElementById('stat-int').value) || 5;
+            let xvo = parseInt(document.getElementById('stat-voi').value) || 0;
+
+            let yde = parseInt(document.getElementById('enemy-def').value) || 5;
+            let yre = parseInt(document.getElementById('enemy-res').value) || 5;
+            let ysp = parseInt(document.getElementById('enemy-spd').value) || 5;
+            let yin = parseInt(document.getElementById('enemy-int').value) || 5;
+            let yvo = parseInt(document.getElementById('enemy-voi').value) || 0;
+
+            // 1. PHYSICAL DAMAGE: XST - YDE/1.25
+            let physDmg = Math.max(0, xst - (yde / 1.25));
+
+            // 2. MAGIC DAMAGE: XIN - YRE, IF YIN > YRE then XIN + YIN/2 - YRE, else 0
+            let magicDmg = 0;
+            if (yin > yre) {
+                magicDmg = xin + (yin / 2) - yre;
+            } else {
+                magicDmg = xin - yre;
+            }
+            if (magicDmg < 0) magicDmg = 0;
+
+            // 3. VOID DAMAGE: XVO - YRE, IF YDE > XVO then (XVO + YVO/2 ) - YVO, else 0
+            let voidDmg = 0;
+            if (yde > xvo) {
+                voidDmg = (xvo + (yvo / 2)) - yvo;
+            } else {
+                voidDmg = xvo - yre;
+            }
+            if (voidDmg < 0) voidDmg = 0;
+
+            // 4. HIT CHANCE (totb): XSP - YSP = x
+            let x = xsp - ysp;
+            let hitReport = "";
+            let hitRollText = "";
+
+            if (x <= 0) {
+                hitReport = "ATTACK ALWAYS MISSES (Accuracy Δ ≤ 0%)";
+            } else if (x >= 100) {
+                hitReport = "ATTACK ALWAYS HITS (Accuracy Δ ≥ 100%)";
+            } else {
+                let roll = Math.floor(Math.random() * 100) + 1;
+                hitRollText = " | d100 Roll: " + roll + " (Needed ≥ " + x + ")";
+                if (roll >= x) {
+                    hitReport = "HIT SUCCESSFUL";
+                } else {
+                    hitReport = "MISS";
+                }
+            }
+
+            document.getElementById('combat-output').innerHTML = 
+                "⚡ PHYS DAMAGE: " + physDmg.toFixed(2) + "<br>" +
+                "🔮 MAGIC DAMAGE: " + magicDmg.toFixed(2) + "<br>" +
+                "🌀 VOID DAMAGE: " + voidDmg.toFixed(2) + "<br>" +
+                "🎯 HIT DETERMINATION: " + hitReport + hitRollText;
+        }
+
+        // Set the core attribute input defaults to 5 right away on page load
+        window.onload = function() {
+            document.getElementById('stat-str').value = 5;
+            document.getElementById('stat-def').value = 5;
+            document.getElementById('stat-spd').value = 5;
+            document.getElementById('stat-gut').value = 5;
+            document.getElementById('stat-int').value = 5;
+            document.getElementById('stat-res').value = 5;
+            document.getElementById('stat-voi').value = 0;
+            updateSheet();
+        };
+    </script>
+</body>
+</html>
