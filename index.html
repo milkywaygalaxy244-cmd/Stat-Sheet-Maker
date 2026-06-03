@@ -282,8 +282,14 @@
             }
             if (voidDmg < 0) voidDmg = 0;
 
-            // 4. HIT CHANCE (totb): XSP - YSP = x
-            let x = xsp - ysp;
+            // 4. HIT CHANCE (totb balanced): Target = 74 - (XSP - YSP)
+            let speedGap = xsp - ysp;
+            let targetToHit = 74 - speedGap;
+
+            // Clamp the target so it stays within d100 boundaries (5% min chance to miss, 5% min chance to hit)
+            if (targetToHit > 95) targetToHit = 95;
+            if (targetToHit < 5) targetToHit = 5;
+
             let hitReport = "";
             let hitRollText = "";
 
@@ -292,13 +298,15 @@
             } else if (x >= 100) {
                 hitReport = "ATTACK ALWAYS HITS (Accuracy Δ ≥ 100%)";
             } else {
-                let roll = Math.floor(Math.random() * 100) + 1;
-                hitRollText = " | d100 Roll: " + roll + " (Needed ≥ " + x + ")";
-                if (roll >= x) {
-                    hitReport = "HIT SUCCESSFUL";
-                } else {
-                    hitReport = "MISS";
-                }
+	                let roll = Math.floor(Math.random() * 100) + 1;
+	            hitRollText = `Rolled a ${roll} (Target: ${targetToHit})`;
+	
+	            if (roll >= targetToHit) {
+	                hitReport = "HIT SUCCESSFUL";
+	                // ... your damage calculation code ...
+	            } else {
+	                hitReport = "ATTACK MISSED";
+	            }
             }
 
             document.getElementById('combat-output').innerHTML = 
