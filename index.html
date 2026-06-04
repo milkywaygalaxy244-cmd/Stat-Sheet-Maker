@@ -298,7 +298,7 @@
             } else if (targetToHit >= 100) {
                 hitReport = "ATTACK ALWAYS HITS (Accuracy Δ ≥ 100%)";
             } else {
-	                let roll = Math.floor(Math.random() * 100) + 1;
+	                let roll = Math.round(Math.random() * 100 + xsp ) - ysp;
 	            hitRollText = `Rolled a ${roll} (Target: ${targetToHit})`;
 	
 	            if (roll >= targetToHit) {
