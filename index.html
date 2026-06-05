@@ -283,32 +283,20 @@
             if (voidDmg < 0) voidDmg = 0;
 
             // 4. HIT CHANCE (totb balanced): Target = 74 - (XSP - YSP)
-            let speedGap = xsp - ysp;
-            let targetToHit = 74 - speedGap;
-
-            // Clamp the target so it stays within d100 boundaries (5% min chance to miss, 5% min chance to hit)
-            if (targetToHit > 95) targetToHit = 95;
-            if (targetToHit < 5) targetToHit = 5;
-
-            let hitReport = "";
-            let hitRollText = "";
-
-            if (targetToHit <= 0) {
-                hitReport = "ATTACK ALWAYS MISSES (Accuracy Δ ≤ 0%)";
-            } else if (targetToHit >= 100) {
-                hitReport = "ATTACK ALWAYS HITS (Accuracy Δ ≥ 100%)";
-            } else {
-	                let roll = Math.round(Math.random() * 100 + xsp ) - ysp;
-	            hitRollText = `Rolled a ${roll} (Target: ${targetToHit})`;
-	
-	            if (roll >= targetToHit) {
-	                hitReport = "HIT SUCCESSFUL";
-	                // ... your damage calculation code ...
-	            } else {
-	                hitReport = "ATTACK MISSED";
-	            }
-            }
-
+            // Calculate raw hit chance based on your formula: ((xsp - (ysp / 2)) * 100) / xsp
+			function calculateHitChance(xsp, ysp) {
+			    // 1. The core formula
+			    let hitChance = ((xsp - (ysp / 2)) * 100) / xsp;
+			
+			    // 2. Rounding to a whole percentage
+			    hitChance = Math.round(hitChance);
+			
+			    // 3. The 1-100% clamp Koko removed
+			    hitChance = Math.max(1, Math.min(100, hitChance));
+			
+			    return hitChance;
+			}
+			
             document.getElementById('combat-output').innerHTML = 
                 "⚡ PHYS DAMAGE: " + physDmg.toFixed(2) + "<br>" +
                 "🔮 MAGIC DAMAGE: " + magicDmg.toFixed(2) + "<br>" +
